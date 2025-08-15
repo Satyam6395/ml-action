@@ -1,0 +1,42 @@
+name: ML Run
+on:
+    push:
+jobs:
+    ml_run:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.13'
+
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install scikit-learn numpy
+            - name: Run the script
+              run: |
+                  python ml_example.py
+                  
+deploy: # this job runs completely on own runner
+    needs: ml_run # this job depends on the ml_run job
+    runs-on: ubuntu-latest # runs the workflow on the latest ubuntu version
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # uses the checkout action to checkout the code
+
+      - name: Set up Python
+        uses: actions/setup-python@v5 # uses the setup-python action to set up the python environment
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: deploy
+        run: echo 'deployment of the model'
